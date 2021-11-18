@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:math';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:shake/shake.dart';
 
@@ -25,6 +27,8 @@ class _Magic8BallAppState extends State<Magic8BallApp> {
 
   int answerNumber = 0;
 
+  bool visible = false;
+
   @override
   void initState() {
     super.initState();
@@ -49,9 +53,7 @@ class _Magic8BallAppState extends State<Magic8BallApp> {
         ),
         body: GestureDetector(
           onTap: () {
-            setState(() {
-              answerNumber = Random().nextInt(answers.length);
-            });
+            generateRandomAnswer();
           },
           child: Stack(
             children: [
@@ -65,10 +67,14 @@ class _Magic8BallAppState extends State<Magic8BallApp> {
               Center(
                 child: Container(
                   width: 100,
-                  child: Text(
-                    answers[answerNumber],
-                    style: TextStyle(color: Colors.blue),
-                    textAlign: TextAlign.center,
+                  child: AnimatedOpacity(
+                    duration: const Duration(milliseconds: 1000),
+                    opacity: visible ? 1.0 : 0.0,
+                    child: Text(
+                      answers[answerNumber],
+                      style: TextStyle(color: Colors.blue),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
               )
@@ -77,5 +83,21 @@ class _Magic8BallAppState extends State<Magic8BallApp> {
         ),
       ),
     );
+  }
+
+  void generateRandomAnswer() {
+    setState(() {
+      visible = false;
+    });
+
+    final player = AudioCache();
+    player.play('magic_music.mp3');
+
+    Timer(const Duration(milliseconds: 1000), () {
+      setState(() {
+        answerNumber = Random().nextInt(answers.length);
+        visible = true;
+      });
+    });
   }
 }
